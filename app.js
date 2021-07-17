@@ -66,7 +66,7 @@ app
 ///////////////////////// Requesting targetting a specific articles!! ////////////////////
 
 app
-  .route("articles/:articleTitle")
+  .route("/articles/:articleTitle")
 
   .get(function (req, res) {
     Article.findOne({ title: req.params.articleTitle }, function (err, result) {
@@ -76,6 +76,29 @@ app
         res.send("No articles matching that title was found.");
       }
     });
+  })
+  .put(function (req, res) {
+    Article.update(
+      { title: req.params.articleTitle },
+      { title: req.body.title, content: req.body.content },
+      { overwrite: true },
+      function (err) {
+        if (!err) {
+          res.send("Successfully Updated article.");
+        }
+      }
+    );
+  })
+  .patch(function (req, res) {
+    Article.update(
+      { title: req.params.articleTitle },
+      { $set: req.body },
+      function (err) {
+        if (!err) {
+          res.send("Successfully Updated article.");
+        }
+      }
+    );
   });
 
 app.listen(3000, function () {

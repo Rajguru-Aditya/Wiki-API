@@ -27,40 +27,56 @@ const articleSchema = {
 
 const Article = mongoose.model("Article", articleSchema);
 
-app.get("/articles", function (req, res) {
-  Article.find(function (err, results) {
-    if (!err) {
-      res.send(results);
-    } else {
-      res.send(err);
-    }
-  });
-});
+///////////////////////// Requesting targetting all articles!! ////////////////////
 
-app.post("/articles", function (req, res) {
-  const newArticle = new Article({
-    title: req.body.title,
-    content: req.body.content,
+app
+  .route("/articles")
+  .get(function (req, res) {
+    Article.find(function (err, results) {
+      if (!err) {
+        res.send(results);
+      } else {
+        res.send(err);
+      }
+    });
+  })
+  .post(function (req, res) {
+    const newArticle = new Article({
+      title: req.body.title,
+      content: req.body.content,
+    });
+    newArticle.save(function (err) {
+      if (!err) {
+        res.send("Successfully added new article.");
+      } else {
+        res.send(err);
+      }
+    });
+  })
+  .delete(function (req, res) {
+    Article.deleteMany({}, function (err) {
+      if (!err) {
+        res.send("Successfully deleted all articles.");
+      } else {
+        res.send(err);
+      }
+    });
   });
 
-  newArticle.save(function (err) {
-    if (!err) {
-      res.send("Successfully added new article.");
-    } else {
-      res.send(err);
-    }
-  });
-});
+///////////////////////// Requesting targetting a specific articles!! ////////////////////
 
-app.delete("/articles", function (req, res) {
-  Article.deleteMany({}, function (err) {
-    if (!err) {
-      res.send("Successfully deleted all articles.");
-    } else {
-      res.send(err);
-    }
+app
+  .route("articles/:articleTitle")
+
+  .get(function (req, res) {
+    Article.findOne({ title: req.params.articleTitle }, function (err, result) {
+      if (result) {
+        res.send(result);
+      } else {
+        res.send("No articles matching that title was found.");
+      }
+    });
   });
-});
 
 app.listen(3000, function () {
   console.log("Server started at port 3000");
